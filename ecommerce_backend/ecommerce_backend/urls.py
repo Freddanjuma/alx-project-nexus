@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
 
 from products.views import ProductViewSet
@@ -14,11 +14,13 @@ from drf_yasg import openapi
 from rest_framework import permissions
 
 
+# Router
 router = DefaultRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'categories', CategoryViewSet)
 
 
+# Swagger configuration
 schema_view = get_schema_view(
     openapi.Info(
         title="E-commerce API",
@@ -30,9 +32,11 @@ schema_view = get_schema_view(
 )
 
 
+# URL patterns
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # API routes
     path('api/', include(router.urls)),
     path('api/users/', include('users.urls')),
     path('api/auth/', include('rest_framework.urls')),
@@ -42,5 +46,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Swagger
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0)),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
